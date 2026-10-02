@@ -21,17 +21,17 @@ powershell -ExecutionPolicy Bypass -File .\run.ps1
 To launch the already built executable directly:
 
 ```powershell
-.\build\drone_simulator.exe
+.\build\drone_simulator_enhanced.exe
 ```
 
 ```powershell
 cmake -S . -B build
 cmake --build build --config Release
-./build/Release/drone_simulator.exe
+./build/Release/drone_simulator_enhanced.exe
 ```
 
 For a single-configuration generator, the executable may instead be at
-`build/drone_simulator.exe`.
+`build/drone_simulator_enhanced.exe`.
 
 ## Controls
 

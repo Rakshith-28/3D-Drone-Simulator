@@ -10,4 +10,4 @@ if (!(Test-Path $cmake)) {
 if ($LASTEXITCODE -ne 0) { throw 'CMake configuration failed.' }
 & $cmake --build build --parallel 4
 if ($LASTEXITCODE -ne 0) { throw 'Build failed.' }
-& (Join-Path $PSScriptRoot 'build/drone_simulator.exe')
+& (Join-Path $PSScriptRoot 'build/drone_simulator_enhanced.exe')

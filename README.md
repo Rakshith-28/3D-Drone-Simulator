@@ -21,17 +21,17 @@ powershell -ExecutionPolicy Bypass -File .\run.ps1
 To launch the already built executable directly:
 
 ```powershell
-.\build\drone_simulator_enhanced.exe
+.\build\drone_simulator_game_controls.exe
 ```
 
 ```powershell
 cmake -S . -B build
 cmake --build build --config Release
-./build/Release/drone_simulator_enhanced.exe
+./build/Release/drone_simulator_game_controls.exe
 ```
 
 For a single-configuration generator, the executable may instead be at
-`build/drone_simulator_enhanced.exe`.
+`build/drone_simulator_game_controls.exe`.
 
 ## Controls
 
@@ -41,7 +41,8 @@ For a single-configuration generator, the executable may instead be at
 | `A` / `D` | Strafe left / right |
 | `R` / `F` | Ascend / descend |
 | `Q` / `E` | Rotate left / right |
-| Touchpad/mouse drag | Hold left click and drag horizontally to rotate |
+| Touchpad/mouse movement | Game-style drone turning and camera look; no click needed |
+| `M` | Release or recapture the mouse pointer |
 | `+` / `-` | Increase / decrease speed |
 | Arrow keys | Orbit the camera |
 | `C` | Cycle chase, cockpit, and overview cameras |

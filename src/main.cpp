@@ -40,8 +40,7 @@ bool showHelp = true;
 bool collisionFlash = false;
 bool nightMode = false;
 bool showFog = false;
-bool pointerDragging = false;
-int lastPointerX = 0;
+bool mouseLookEnabled = true;
 int collisionFrames = 0;
 int windowWidth = 1280, windowHeight = 720;
 int lastTimeMs = 0;
@@ -215,7 +214,7 @@ void drawHud() {
     std::ostringstream line; line<<std::fixed<<std::setprecision(1)<<"ALT "<<dronePos.y<<" m   SPEED "<<moveSpeed<<"   CAMERA "<<(cameraMode==0?"CHASE":cameraMode==1?"COCKPIT":"OVERVIEW")<<"   AUTOPILOT "<<(autoPilot?"ON":"OFF")<<"   "<<(nightMode?"NIGHT":"DAY");
     text(18,windowHeight-28,line.str());
     if (collisionFlash) { glColor3f(1,0.25f,0.15f); text(windowWidth/2-90,windowHeight-55,"OBSTACLE - MOVEMENT BLOCKED"); }
-    if (showHelp) { glColor3f(0.8f,0.86f,0.9f); text(18,48,"W/S forward  A/D strafe  R/F altitude  drag touchpad/mouse to turn"); text(18,27,"C camera  P autopilot  N day/night  V fog  G grid  H help  Esc quit"); }
+    if (showHelp) { glColor3f(0.8f,0.86f,0.9f); text(18,48,"W/S forward  A/D strafe  R/F altitude  move touchpad/mouse to look"); text(18,27,"C camera  P autopilot  M release mouse  N day/night  V fog  H help"); }
     glPopMatrix(); glMatrixMode(GL_PROJECTION); glPopMatrix(); glMatrixMode(GL_MODELVIEW);
     glEnable(GL_DEPTH_TEST); glEnable(GL_LIGHTING);
 }
@@ -277,6 +276,11 @@ void keyDown(unsigned char k,int,int) {
     if(k=='p'||k=='P')autoPilot=!autoPilot;
     if(k=='g'||k=='G')showGrid=!showGrid;
     if(k=='h'||k=='H')showHelp=!showHelp;
+    if(k=='m'||k=='M') {
+        mouseLookEnabled=!mouseLookEnabled;
+        glutSetCursor(mouseLookEnabled?GLUT_CURSOR_NONE:GLUT_CURSOR_INHERIT);
+        if(mouseLookEnabled) glutWarpPointer(windowWidth/2,windowHeight/2);
+    }
     if(k=='n'||k=='N')nightMode=!nightMode;
     if(k=='v'||k=='V') {
         showFog=!showFog;
@@ -290,19 +294,15 @@ void keyUp(unsigned char k,int,int){keys[k]=false;}
 void specialDown(int k,int,int){if(k>=0&&k<256)specialKeys[k]=true;}
 void specialUp(int k,int,int){if(k>=0&&k<256)specialKeys[k]=false;}
 
-void pointerButton(int button,int state,int x,int) {
-    if(button==GLUT_LEFT_BUTTON) {
-        pointerDragging=(state==GLUT_DOWN);
-        lastPointerX=x;
-    }
-}
-
-void pointerDrag(int x,int) {
-    if(!pointerDragging) return;
-    int deltaX=x-lastPointerX;
-    droneYaw-=deltaX*0.45f;
-    droneRoll=std::clamp(-deltaX*0.7f,-12.0f,12.0f);
-    lastPointerX=x;
+void pointerLook(int x,int y) {
+    if(!mouseLookEnabled) return;
+    const int centerX=windowWidth/2, centerY=windowHeight/2;
+    const int deltaX=x-centerX, deltaY=y-centerY;
+    if(deltaX==0 && deltaY==0) return;
+    droneYaw-=deltaX*0.32f;
+    cameraPitch=std::clamp(cameraPitch-deltaY*0.20f,-10.0f,65.0f);
+    droneRoll=std::clamp(-deltaX*0.35f,-12.0f,12.0f);
+    glutWarpPointer(centerX,centerY);
 }
 
 int main(int argc,char** argv) {
@@ -310,7 +310,7 @@ int main(int argc,char** argv) {
     glEnable(GL_DEPTH_TEST); glEnable(GL_LIGHTING); glEnable(GL_LIGHT0); glEnable(GL_COLOR_MATERIAL); glEnable(GL_NORMALIZE); glEnable(GL_MULTISAMPLE);
     glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE); glClearColor(0.46f,0.70f,0.90f,1);
     const GLfloat ambient[]={0.28f,0.28f,0.32f,1}; const GLfloat diffuse[]={0.9f,0.88f,0.78f,1}; glLightfv(GL_LIGHT0,GL_AMBIENT,ambient); glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuse);
-    glutDisplayFunc(display); glutReshapeFunc(reshape); glutKeyboardFunc(keyDown); glutKeyboardUpFunc(keyUp); glutSpecialFunc(specialDown); glutSpecialUpFunc(specialUp); glutMouseFunc(pointerButton); glutMotionFunc(pointerDrag); glutIdleFunc(update);
+    glutDisplayFunc(display); glutReshapeFunc(reshape); glutKeyboardFunc(keyDown); glutKeyboardUpFunc(keyUp); glutSpecialFunc(specialDown); glutSpecialUpFunc(specialUp); glutPassiveMotionFunc(pointerLook); glutMotionFunc(pointerLook); glutSetCursor(GLUT_CURSOR_NONE); glutWarpPointer(windowWidth/2,windowHeight/2); glutIdleFunc(update);
     lastTimeMs=glutGet(GLUT_ELAPSED_TIME); glutMainLoop(); return 0;
 }
 

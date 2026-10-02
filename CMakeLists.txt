@@ -20,7 +20,7 @@ FetchContent_MakeAvailable(freeglut)
 find_package(OpenGL REQUIRED)
 
 add_executable(drone_simulator src/main.cpp)
-set_target_properties(drone_simulator PROPERTIES OUTPUT_NAME drone_simulator_enhanced)
+set_target_properties(drone_simulator PROPERTIES OUTPUT_NAME drone_simulator_game_controls)
 target_include_directories(drone_simulator PRIVATE "${freeglut_SOURCE_DIR}/include")
 target_link_libraries(drone_simulator PRIVATE freeglut_static OpenGL::GL OpenGL::GLU)
 target_compile_definitions(drone_simulator PRIVATE FREEGLUT_STATIC)
